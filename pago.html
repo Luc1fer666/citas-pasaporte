@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pago de Trámite — Pasaporte Mexicano</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dorado:        #D4AF37;
+    --dorado-claro:  #F2D57E;
+    --dorado-oscuro: #A67C00;
+    --negro:         #000000;
+    --negro-suave:   #111111;
+    --negro-card:    #0D0D0D;
+    --negro-input:   #161616;
+    --negro-borde:   #2A2A2A;
+    --texto-base:    #E8DFC0;
+    --texto-muted:   #7A7060;
+    --verde-ok:      #2A6B3A;
+    --verde-ok-bg:   rgba(42,107,58,0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--negro);
+    color: var(--texto-base);
+    min-height: 100vh;
+    padding-top: 72px;
+  }
+
+  /* ── NAVBAR ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: 72px; display: flex; align-items: center;
+    justify-content: space-between; padding: 0 60px;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(212,175,55,0.1);
+  }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: 12px; text-decoration: none;
+  }
+  .nav-logo .escudo {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid var(--dorado);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; background: rgba(212,175,55,0.06);
+  }
+  .nav-logo span {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-weight: 700; color: var(--dorado-claro);
+  }
+
+  .nav-back {
+    font-size: 12px; color: var(--texto-muted);
+    text-decoration: none; letter-spacing: 1px;
+    text-transform: uppercase; display: flex; align-items: center; gap: 8px;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--dorado); }
+
+  /* ── LAYOUT ── */
+  .page-wrap {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+  }
+
+  /* ── ENCABEZADO ── */
+  .page-header {
+    text-align: center;
+    margin-bottom: 56px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .page-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--dorado-oscuro); margin-bottom: 14px;
+  }
+  .page-eyebrow::before, .page-eyebrow::after {
+    content: ''; width: 24px; height: 1px; background: var(--dorado-oscuro);
+  }
+
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700; color: white; line-height: 1.1; margin-bottom: 12px;
+  }
+  .page-header h1 em { font-style: italic; color: var(--dorado-claro); }
+
+  .page-header p {
+    font-size: 15px; color: var(--texto-muted);
+    font-weight: 300; line-height: 1.7;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESUMEN DEL COBRO ── */
+  .resumen-cobro {
+    background: linear-gradient(135deg, #0D0D00, #1A1500, #0D0D00);
+    border: 1px solid var(--dorado-oscuro);
+    border-radius: 6px;
+    padding: 36px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 36px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+
+  .resumen-cobro::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      45deg, transparent, transparent 40px,
+      rgba(212,175,55,0.015) 40px, rgba(212,175,55,0.015) 41px
+    );
+  }
+
+  .resumen-cobro::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--dorado-oscuro), transparent);
+  }
+
+  .cobro-info { position: relative; z-index: 1; }
+
+  .cobro-label {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--texto-muted); margin-bottom: 6px;
+  }
+
+  .cobro-concepto {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; color: var(--dorado-claro); font-weight: 600;
+  }
+
+  .cobro-folio {
+    font-size: 12px; color: var(--texto-muted);
+    margin-top: 4px; letter-spacing: 0.5px;
+  }
+
+  .cobro-monto {
+    position: relative; z-index: 1;
+    text-align: right;
+  }
+
+  .monto-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 56px; font-weight: 700;
+    color: var(--dorado-claro); line-height: 1;
+  }
+
+  .monto-moneda {
+    font-size: 16px; color: var(--dorado-oscuro);
+    letter-spacing: 1px;
+  }
+
+  .monto-nota {
+    font-size: 11px; color: var(--texto-muted);
+    margin-top: 4px; letter-spacing: 0.3px;
+  }
+
+  /* ── GRID PRINCIPAL ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+
+  /* ── CARD GENÉRICO ── */
+  .card {
+    background: var(--negro-card);
+    border: 1px solid var(--negro-borde);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--negro-borde);
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .card-header-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(212,175,55,0.08);
+    border: 1px solid rgba(212,175,55,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0;
+  }
+
+  .card-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px; color: var(--dorado-claro); font-weight: 600;
+  }
+
+  .card-header p {
+    font-size: 12px; color: var(--texto-muted); margin-top: 2px;
+  }
+
+  .card-body { padding: 28px; }
+
+  /* ── DATOS BANCARIOS ── */
+  .banco-row {
+    display: flex; align-items: flex-start;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--negro-borde);
+    gap: 16px;
+  }
+
+  .banco-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .banco-row:first-child { padding-top: 0; }
+
+  .banco-key {
+    font-size: 10.5px; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--texto-muted);
+    font-weight: 600; flex-shrink: 0; padding-top: 2px;
+    min-width: 110px;
+  }
+
+  .banco-val {
+    font-size: 14.5px; color: var(--texto-base);
+    font-weight: 500; text-align: right; word-break: break-all;
+  }
+
+  /* CLABE highlight */
+  .clabe-val {
+    font-family: 'Courier New', monospace;
+    font-size: 17px;
+    color: var(--dorado-claro);
+    letter-spacing: 2px;
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap; justify-content: flex-end;
+  }
+
+  .btn-copy {
+    background: rgba(212,175,55,0.1);
+    border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 3px;
+    padding: 4px 10px;
+    font-family: 'Jost', sans-serif;
+    font-size: 10px; letter-spacing: 1px;
+    color: var(--dorado-oscuro);
+    cursor: pointer;
+    transition: all 0.2s; white-space: nowrap;
+  }
+
+  .btn-copy:hover {
+    background: rgba(212,175,55,0.18);
+    color: var(--dorado);
+    border-color: var(--dorado-oscuro);
+  }
+
+  /* ── AVISO IMPORTANTE ── */
+  .aviso {
+    background: rgba(212,175,55,0.04);
+    border: 1px solid rgba(212,175,55,0.15);
+    border-left: 3px solid var(--dorado-oscuro);
+    border-radius: 0 4px 4px 0;
+    padding: 14px 18px;
+    font-size: 12.5px; color: #9A8A50;
+    line-height: 1.7; margin-top: 24px;
+  }
+
+  .aviso strong { color: var(--dorado-oscuro); }
+
+  /* ── PASOS DE PAGO ── */
+  .pasos-pago { display: flex; flex-direction: column; gap: 0; }
+
+  .paso-pago {
+    display: flex; gap: 18px; align-items: flex-start;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--negro-borde);
+  }
+
+  .paso-pago:last-child { border-bottom: none; padding-bottom: 0; }
+  .paso-pago:first-child { padding-top: 0; }
+
+  .paso-num-circle {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(212,175,55,0.1);
+    border: 1px solid rgba(212,175,55,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--dorado);
+    flex-shrink: 0; margin-top: 1px;
+  }
+
+  .paso-texto h4 {
+    font-size: 13.5px; font-weight: 600; color: var(--texto-base); margin-bottom: 4px;
+  }
+
+  .paso-texto p {
+    font-size: 12.5px; color: var(--texto-muted); line-height: 1.6;
+  }
+
+  /* ── COLUMNA DERECHA ── */
+  .right-col { display: flex; flex-direction: column; gap: 24px; }
+
+  /* ── FORMULARIO COMPROBANTE ── */
+  .campo { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+  .campo:last-of-type { margin-bottom: 0; }
+
+  .campo label {
+    font-size: 10px; font-weight: 600; color: var(--texto-muted);
+    text-transform: uppercase; letter-spacing: 1.2px;
+  }
+
+  .campo label .req { color: var(--dorado); margin-left: 2px; }
+
+  .input-wrap { position: relative; }
+
+  .input-icon {
+    position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+    font-size: 14px; opacity: 0.4; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .input-wrap:focus-within .input-icon { opacity: 0.8; }
+
+  input[type="text"], input[type="email"], input[type="date"],
+  input[type="number"], select, textarea {
+    width: 100%; border: 1px solid var(--negro-borde); border-radius: 4px;
+    padding: 12px 14px 12px 40px;
+    font-family: 'Jost', sans-serif; font-size: 14px;
+    color: var(--texto-base); background: var(--negro-input);
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--dorado);
+    box-shadow: 0 0 0 3px rgba(212,175,55,0.1);
+    background: #1A1800;
+  }
+
+  input::placeholder { color: #35301A; }
+
+  /* upload comprobante */
+  .upload-box {
+    border: 1.5px dashed rgba(212,175,55,0.25);
+    border-radius: 4px; background: var(--negro-input);
+    padding: 28px 20px; text-align: center; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 16px;
+  }
+
+  .upload-box:hover {
+    border-color: var(--dorado-oscuro);
+    background: rgba(212,175,55,0.03);
+  }
+
+  .upload-box input { display: none; }
+  .upload-icon { font-size: 30px; margin-bottom: 8px; opacity: 0.5; }
+  .upload-box p { font-size: 12.5px; color: var(--texto-muted); line-height: 1.6; }
+  .upload-box strong { color: var(--dorado-oscuro); }
+
+  /* ── TEMPORIZADOR ── */
+  .timer-card {
+    background: rgba(212,175,55,0.03);
+    border: 1px solid rgba(212,175,55,0.12);
+    border-radius: 6px; padding: 20px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+
+  .timer-icon { font-size: 28px; flex-shrink: 0; }
+
+  .timer-label {
+    font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--texto-muted); margin-bottom: 4px;
+  }
+
+  .timer-digits {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px; color: var(--dorado-claro); font-weight: 700;
+    line-height: 1; letter-spacing: 2px;
+  }
+
+  .timer-nota {
+    font-size: 11px; color: var(--texto-muted); margin-top: 3px;
+  }
+
+  /* ── BOTÓN ENVIAR ── */
+  .btn-primary {
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, var(--dorado-oscuro) 0%, var(--dorado) 55%, var(--dorado-claro) 100%);
+    color: var(--negro); border: none; border-radius: 4px;
+    font-family: 'Jost', sans-serif; font-size: 13px;
+    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.25s; margin-top: 20px;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(212,175,55,0.3);
+    filter: brightness(1.08);
+  }
+
+  /* ── ESTADO: COMPROBANTE ENVIADO ── */
+  .success-msg {
+    display: none;
+    background: var(--verde-ok-bg);
+    border: 1px solid rgba(42,107,58,0.4);
+    border-left: 3px solid #4CAF50;
+    border-radius: 4px; padding: 16px 20px;
+    font-size: 13px; color: #7ACC8A; line-height: 1.6; margin-top: 16px;
+  }
+
+  /* ── BADGE DE SEGURIDAD ── */
+  .seguridad-badges {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    padding: 20px 28px;
+    border-top: 1px solid var(--negro-borde);
+    background: rgba(212,175,55,0.02);
+  }
+
+  .badge {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 11px; color: var(--texto-muted); letter-spacing: 0.3px;
+  }
+
+  .badge-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--dorado-oscuro); flex-shrink: 0;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 820px) {
+    nav { padding: 0 24px; }
+    .page-wrap { padding: 40px 20px 80px; }
+    .main-grid { grid-template-columns: 1fr; }
+    .resumen-cobro { flex-direction: column; gap: 16px; }
+    .cobro-monto { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="home.html" class="nav-logo">
+    <div class="escudo">🦅</div>
+    <span>Portal SRE</span>
+  </a>
+  <a href="pasaporte-mexicano.html" class="nav-back">← Volver al formulario</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- ENCABEZADO -->
+  <div class="page-header">
+    <div class="page-eyebrow">Paso final</div>
+    <h1>Pago del <em>trámite</em></h1>
+    <p>Realiza tu transferencia SPEI y envía tu comprobante para confirmar tu solicitud.</p>
+  </div>
+
+  <!-- RESUMEN DEL COBRO -->
+  <div class="resumen-cobro">
+    <div class="cobro-info">
+      <div class="cobro-label">Concepto de pago</div>
+      <div class="cobro-concepto">Gestoría — Trámite de Pasaporte Mexicano</div>
+      <div class="cobro-folio">Folio de referencia: <strong style="color:var(--dorado-oscuro)">SRE-2024-XXXX</strong></div>
+    </div>
+    <div class="cobro-monto">
+      <div class="monto-num">$500</div>
+      <div class="monto-moneda">MXN</div>
+      <div class="monto-nota">Pago único · Sin cargos adicionales</div>
+    </div>
+  </div>
+
+  <!-- GRID PRINCIPAL -->
+  <div class="main-grid">
+
+    <!-- COLUMNA IZQUIERDA -->
+    <div style="display:flex; flex-direction:column; gap:24px;">
+
+      <!-- DATOS BANCARIOS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">🏦</div>
+          <div>
+            <h2>Datos para transferencia SPEI</h2>
+            <p>Usa exactamente estos datos en tu banca en línea</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="banco-row">
+            <div class="banco-key">Banco</div>
+            <!-- ✏️ EDITA AQUÍ: cambia el nombre de tu banco -->
+            <div class="banco-val">Santander</div>
+          </div>
+          <div class="banco-row">
+            <div class="banco-key">Beneficiario</div>
+            <!-- ✏️ EDITA AQUÍ: nombre del titular de la cuenta -->
+            <div class="banco-val">Fabian Michel Cortes Aguilar</div>
+          </div>
+          <div class="banco-row">
+            <div class="banco-key">CLABE<br>interbancaria</div>
+            <div class="banco-val">
+              <div class="clabe-val">
+                <!-- ✏️ EDITA AQUÍ: pon tu CLABE de 18 dígitos -->
+                <span id="clabeText">014266140089870501</span>
+                <button class="btn-copy" onclick="copiarCLABE()">Copiar</button>
+              </div>
+            </div>
+          </div>
+          <div class="banco-row">
+            <div class="banco-key">Importe</div>
+            <div class="banco-val" style="color:var(--dorado-claro); font-size:18px; font-weight:600;">$500.00 MXN</div>
+          </div>
+          <div class="banco-row">
+            <div class="banco-key">Concepto</div>
+            <!-- ✏️ EDITA AQUÍ: el concepto que quieres que escriba el cliente -->
+            <div class="banco-val">Gestoría Pasaporte + tu folio</div>
+          </div>
+
+          <div class="aviso">
+            ⚠️ <strong>Importante:</strong> Usa el folio de tu solicitud como referencia al realizar la transferencia. El pago debe realizarse en un plazo máximo de <strong>24 horas</strong> a partir de enviar tu formulario. Después de transferir, sube tu comprobante en esta misma página.
+          </div>
+        </div>
+
+        <div class="seguridad-badges">
+          <div class="badge"><div class="badge-dot"></div> Transferencia segura SPEI</div>
+          <div class="badge"><div class="badge-dot"></div> Sin datos de tarjeta</div>
+          <div class="badge"><div class="badge-dot"></div> Confirmación en 24 hrs</div>
+        </div>
+      </div>
+
+      <!-- CÓMO PAGAR PASO A PASO -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">📋</div>
+          <div>
+            <h2>¿Cómo realizar tu pago?</h2>
+            <p>Sigue estos pasos desde tu banca en línea o app</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="pasos-pago">
+            <div class="paso-pago">
+              <div class="paso-num-circle">1</div>
+              <div class="paso-texto">
+                <h4>Ingresa a tu banca en línea o app</h4>
+                <p>Cualquier banco mexicano permite hacer transferencias SPEI desde su aplicación o sitio web.</p>
+              </div>
+            </div>
+            <div class="paso-pago">
+              <div class="paso-num-circle">2</div>
+              <div class="paso-texto">
+                <h4>Selecciona "Transferencia SPEI"</h4>
+                <p>Elige la opción de nueva transferencia a otro banco e ingresa la CLABE interbancaria de 18 dígitos.</p>
+              </div>
+            </div>
+            <div class="paso-pago">
+              <div class="paso-num-circle">3</div>
+              <div class="paso-texto">
+                <h4>Captura $500.00 MXN como importe</h4>
+                <p>Verifica que el beneficiario mostrado coincida con el nombre registrado antes de confirmar.</p>
+              </div>
+            </div>
+            <div class="paso-pago">
+              <div class="paso-num-circle">4</div>
+              <div class="paso-texto">
+                <h4>Agrega tu folio en el concepto</h4>
+                <p>Escribe tu número de folio (ej. SRE-2024-XXXX) en el campo de concepto o referencia para identificar tu pago.</p>
+              </div>
+            </div>
+            <div class="paso-pago">
+              <div class="paso-num-circle">5</div>
+              <div class="paso-texto">
+                <h4>Descarga y sube tu comprobante</h4>
+                <p>Guarda el comprobante en PDF o imagen y súbelo en el formulario de esta misma página.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="right-col">
+
+      <!-- TEMPORIZADOR -->
+      <div class="timer-card">
+        <div class="timer-icon">⏳</div>
+        <div>
+          <div class="timer-label">Tiempo para pagar</div>
+          <div class="timer-digits" id="timer">23:59:59</div>
+          <div class="timer-nota">Tu solicitud se reserva por 24 horas</div>
+        </div>
+      </div>
+
+      <!-- FORMULARIO COMPROBANTE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">📤</div>
+          <div>
+            <h2>Enviar comprobante</h2>
+            <p>Confirma tu pago subiendo el comprobante</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <form onsubmit="enviarComprobante(event)">
+
+            <div class="campo">
+              <label>Nombre completo <span class="req">✦</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" placeholder="Como aparece en tu solicitud" required>
+              </div>
+            </div>
+
+            <div class="campo">
+              <label>Correo electrónico <span class="req">✦</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">✉</span>
+                <input type="email" placeholder="Para enviarte confirmación" required>
+              </div>
+            </div>
+
+            <div class="campo">
+              <label>Folio de solicitud <span class="req">✦</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">🔖</span>
+                <input type="text" placeholder="SRE-2024-XXXX" required>
+              </div>
+            </div>
+
+            <div class="campo">
+              <label>Fecha de transferencia <span class="req">✦</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">📅</span>
+                <input type="date" required>
+              </div>
+            </div>
+
+            <div class="campo">
+              <label>Número de referencia bancaria</label>
+              <div class="input-wrap">
+                <span class="input-icon">🔢</span>
+                <input type="text" placeholder="Clave de rastreo o referencia">
+              </div>
+            </div>
+
+            <!-- UPLOAD -->
+            <label class="upload-box" for="comprobante-file" id="uploadBox">
+              <div class="upload-icon">📎</div>
+              <p><strong>Haz clic para adjuntar tu comprobante</strong><br>PDF, JPG o PNG · Máx. 5 MB</p>
+              <input type="file" id="comprobante-file" accept=".pdf,.jpg,.jpeg,.png" onchange="previewFile(this)">
+            </label>
+
+            <button type="submit" class="btn-primary">Enviar comprobante ✦</button>
+          </form>
+
+          <div class="success-msg" id="successMsg">
+            ✅ <strong>¡Comprobante recibido!</strong> Verificaremos tu pago en un plazo de 2 horas hábiles y te enviaremos la confirmación de tu trámite al correo registrado.
+          </div>
+        </div>
+      </div>
+
+      <!-- SOPORTE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">💬</div>
+          <div>
+            <h2>¿Necesitas ayuda?</h2>
+            <p>Estamos para apoyarte</p>
+          </div>
+        </div>
+        <div class="card-body" style="display:flex; flex-direction:column; gap:14px;">
+          <!-- ✏️ EDITA AQUÍ: tu número de WhatsApp y correo de soporte -->
+          <a href="7671109119" target="_blank"
+            style="display:flex; align-items:center; gap:12px; text-decoration:none;
+                   background:var(--negro-input); border:1px solid var(--negro-borde);
+                   border-radius:4px; padding:14px 16px; transition: border-color 0.2s;"
+            onmouseover="this.style.borderColor='rgba(212,175,55,0.3)'"
+            onmouseout="this.style.borderColor='var(--negro-borde)'">
+            <span style="font-size:20px;">💬</span>
+            <div>
+              <div style="font-size:13px; color:var(--texto-base); font-weight:500;">WhatsApp</div>
+              <!-- ✏️ EDITA AQUÍ: tu número visible -->
+              <div style="font-size:11px; color:var(--texto-muted);">+52 7671109119</div>
+            </div>
+          </a>
+          <a href="mailto:contacto@tusitio.com"
+            style="display:flex; align-items:center; gap:12px; text-decoration:none;
+                   background:var(--negro-input); border:1px solid var(--negro-borde);
+                   border-radius:4px; padding:14px 16px; transition: border-color 0.2s;"
+            onmouseover="this.style.borderColor='rgba(212,175,55,0.3)'"
+            onmouseout="this.style.borderColor='var(--negro-borde)'">
+            <span style="font-size:20px;">✉️</span>
+            <div>
+              <div style="font-size:13px; color:var(--texto-base); font-weight:500;">Correo electrónico</div>
+              <!-- ✏️ EDITA AQUÍ: tu correo de contacto -->
+              <div style="font-size:11px; color:var(--texto-muted);">fabianmichelcortesaguilar@gmail.com</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════ SCRIPTS ════ -->
+<script>
+  // ── COPIAR CLABE ──
+  function copiarCLABE() {
+    const clabe = document.getElementById('clabeText').textContent.trim();
+    navigator.clipboard.writeText(clabe).then(() => {
+      const btn = document.querySelector('.btn-copy');
+      btn.textContent = '¡Copiado!';
+      btn.style.color = 'var(--dorado-claro)';
+      setTimeout(() => { btn.textContent = 'Copiar'; btn.style.color = ''; }, 2000);
+    });
+  }
+
+  // ── PREVIEW ARCHIVO ──
+  function previewFile(input) {
+    if (!input.files || !input.files[0]) return;
+    const name = input.files[0].name;
+    const box  = document.getElementById('uploadBox');
+    box.querySelector('p').innerHTML =
+      `<strong style="color:var(--dorado-claro)">✓ ${name}</strong><br>
+       <span style="font-size:11px">Haz clic para cambiar el archivo</span>`;
+    box.style.borderColor = 'rgba(212,175,55,0.4)';
+  }
+
+  // ── ENVIAR COMPROBANTE ──
+  function enviarComprobante(e) {
+    e.preventDefault();
+    const msg = document.getElementById('successMsg');
+    msg.style.display = 'block';
+    e.target.querySelector('.btn-primary').textContent = '✓ Enviado';
+    e.target.querySelector('.btn-primary').style.background = 'var(--verde-ok)';
+    e.target.querySelector('.btn-primary').style.color = 'white';
+    e.target.querySelector('.btn-primary').disabled = true;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── TEMPORIZADOR 24 HRS ──
+  (function() {
+    const KEY = 'pago_timer_end';
+    let end = localStorage.getItem(KEY);
+    if (!end) {
+      end = Date.now() + 24 * 60 * 60 * 1000;
+      localStorage.setItem(KEY, end);
+    }
+    function tick() {
+      const diff = Math.max(0, end - Date.now());
+      const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+      const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+      const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+      document.getElementById('timer').textContent = `${h}:${m}:${s}`;
+      if (diff > 0) setTimeout(tick, 1000);
+      else document.getElementById('timer').textContent = 'Expirado';
+    }
+    tick();
+  })();
+</script>
+</body>
+</html>
